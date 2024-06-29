@@ -25,7 +25,7 @@ An [*anaconda*](https://www.anaconda.com/distribution/) environment is recommend
 There are 5 main methods called in the main.py file. We will refer to them according to the numbers to indicate how they should be commented on at a specific stage of the experiment. 
 
 
-The path value should be set to 'DATASET_DATA_DIR' as shown in [file](https://github.com/CarolRameder/NaroNet/blob/main/NaroNet-main/src/main.py).
+The path value should be set to 'DATASET_DATA_DIR' as shown in line 83 from [file](https://github.com/CarolRameder/NaroNet/blob/main/NaroNet-main/src/main.py).
 ```python
 #1
 preprocess_images(path,params['PCL_ZscoreNormalization'],params['PCL_patch_size'])
@@ -43,6 +43,8 @@ run_NaroNet(path,params)
 get_BioInsights(path,params)
 ```
 
+# Exp 1
+
 Step 1: Create the environment
 
 ```sh
@@ -51,14 +53,50 @@ conda activate rerunnaro
 ```
 Step 2: Train the PCL component by running the main.py file within the virtual environment. Now, #3, #4 and #5 are commented to be disabled. 
 
+```python
+#1
+preprocess_images(path,params['PCL_ZscoreNormalization'],params['PCL_patch_size'])
+
+#2
+patch_contrastive_learning(path,params)    
+
+#3
+#params = architecture_search(path,params,possible_params)
+
+#4
+#run_NaroNet(path,params)
+
+#5
+#get_BioInsights(path,params)
+```
+
 ```sh
 cd your_path/NaroNet/NaroNet-main/src/main.py
 python3 main.py
 ```
 
-Step 3: PCL inference process. With the trained weights, the model generates the embeddings. Run the main.py file again in the same configuration and virtual environment.
+Step 3: PCL inference process. With the trained weights, the model generates the embeddings. Rerun the main.py file in the same configuration and virtual environment.
 
 Step 4: Run NaroNet and get BioInsights. Here, the commented methods are #1, #2. 
+
+```python
+#1
+#preprocess_images(path,params['PCL_ZscoreNormalization'],params['PCL_patch_size'])
+
+#2
+#patch_contrastive_learning(path,params)    
+
+#3
+params = architecture_search(path,params,possible_params)
+
+#4
+run_NaroNet(path,params)
+
+#5
+get_BioInsights(path,params)
+```
+
+# Exp 3
 
 The environment "idec" was used for Experiment 3, only to to reconstruct the embeddings. When generating the embeddings with the PCL component and running the GNN component, the environment should be changed to "rerunnaro". The instructions regarding the methods in the main.py apply here as well. 
 
@@ -68,14 +106,31 @@ conda env create -f idec.yaml
 conda activate rerunnaro
 ```
 
-Step 2: Train the PCL component (with the initial environment !!). Here, the commented methods in the NaroNet main.py file are #3, #4 and #5.
+Step 2: Train the PCL component (with the initial environment !!). The commented methods in the NaroNet main.py file are #3, #4 and #5.
+
+```python
+#1
+preprocess_images(path,params['PCL_ZscoreNormalization'],params['PCL_patch_size'])
+
+#2
+patch_contrastive_learning(path,params)    
+
+#3
+#params = architecture_search(path,params,possible_params)
+
+#4
+#run_NaroNet(path,params)
+
+#5
+#get_BioInsights(path,params)
+```
 
 ```sh
 cd your_path/NaroNet/NaroNet-main/src/main.py
 python3 main.py
 ```
 
-Step 3: PCL inference process. With the trained weights, the model generates the embeddings. Run the main.py file again as in Step 2.
+Step 3: PCL inference process. With the trained weights, the model generates the embeddings. Rerun the main.py file as in Step 2.
 
 Step 4: Run the three cells from "Column-wise processing" section in the [file](https://github.com/CarolRameder/NaroNet/blob/main/EXP3/Pipeline.ipynb). This normalizes the embedding to the scale required by the Auto Encoder(AE) component. All the embeddings from all images in the dataset are merged in one ".npy". This is the input format for the AE.
 
@@ -108,6 +163,23 @@ conda activate rerunnaro
 
 Step 11: Run NaroNet and get BioInsights (as previously). Here, the commented methods in the NaroNet main.py file are #1 and #2. 
 
+```python
+#1
+#preprocess_images(path,params['PCL_ZscoreNormalization'],params['PCL_patch_size'])
+
+#2
+#patch_contrastive_learning(path,params)    
+
+#3
+params = architecture_search(path,params,possible_params)
+
+#4
+run_NaroNet(path,params)
+
+#5
+get_BioInsights(path,params)
+```
+
 ```sh
 cd your_path/NaroNet/NaroNet-main/src/main.py
 python3 main.py
@@ -134,9 +206,9 @@ DATASET_DATA_DIR/
 		
 ```
 In the 'Raw_Data/Images' folder we expect multiplex image data consisting of multi-page '.tiff' files with one channel/marker per page.
-In the 'Raw_Data/Masks' folder put masks with the same size as the images with the same name, with 1's for the pixels that should be analyzed and 0's for the pixels that should be ignored.
+In the 'Raw_Data/Masks' folder masks with the same size as the images with the same name can be stored. These should have 1's for the pixels that should be analyzed and 0's for the pixels that should be ignored.
 In the 'Raw_Data/Experiment_Information' two files are expected:
-* Channels.txt contains per row the name of each marker/channel present in the multiplex image. In case the name of the row is 'None' it will be ignored and not loaded from the raw image. See example [file](https://github.com/djimenezsanchez/NaroNet/blob/main/examples/Channels.txt) or example below:
+* Channels.txt contains per row the name of each marker/channel present in the multiplex image. In case the name of the row is 'None' it will be ignored and not loaded from the raw image. See example [files](https://github.com/djimenezsanchez/NaroNet/blob/main/examples/Channels.txt) or example below:
 ```bash
 Marker_1
 Marker_2 
@@ -153,7 +225,7 @@ Marker_4
 | image_3.tiff | Treatment | High |
 | ... | ... | ... |
 
-* Patient_to_Image.xlsx (optional) can be utilized in case more than one image is available per subject and you want to merge them into one subject graph. When images have the same subject identifier (e.g., 'Subject_Name') they will be joined into one disjoint graph. Please notice that when this file exists, you should change the 'Image_Names' column in 'Image_Labels.xlsx' with the new subject names (e.g., change 'image_1.tiff' with 'subject_1'). See example [file](https://github.com/djimenezsanchez/NaroNet/blob/main/examples/Patient_to_Image.xlsx) or example below:
+* Patient_to_Image.xlsx (optional) can be utilized in case more than one image is available per subject and you want to merge them into one subject graph. When images have the same subject identifier (e.g., 'Subject_Name') they will be joined into one disjoint graph. Please notice that when this file exists, you should change the 'Image_Names' column in 'Image_Labels.xlsx' with the new subject names (e.g., change 'image_1.tiff' with 'subject_1'). See example files in the [folder](https://github.com/CarolRameder/NaroNet/tree/main/Metadata%20for%20multiple%20images%20per%20patient) or the  small example below:
 
 | Image_Name | Subject_Name |
 | :-- | :-:| 
@@ -161,6 +233,8 @@ Marker_4
 | image_2.tiff | subject_1 | 
 | image_3.tiff | subject_2 | 
 | ... | ... | ... |
+
+This setup was tried with the hardware configuration mentioned in [Requirements and installation](#Requirements-and-installation). It raised a GPU memory overload issue for Exp1 and Exp2 as the Graphs get too large to be loaded.
 
 ## Preparing parameter configuration
 In the following sections (i.e., preprocessing, PCL, NaroNet, BioInsights) several parameters are required to be set. Although parameters will be explained in each section, all of them should be specified in the file named 'DatasetParameters.py', which is located in the folder 'NaroNet/src/utils'. Change it to your own configuration, where 'DATASET_DATA_DIR' is your target folder. See example [file](https://github.com/CarolRameder/NaroNet/blob/main/NaroNet-main/src/NaroNet/utils/DatasetParameters.py) or example below:
